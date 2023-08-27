@@ -26,6 +26,7 @@ export class ScreenState {
 
         const webSocketPair = new WebSocketPair();
         const [client, server] = Object.values(webSocketPair);
+        
         await this.handleSession(server);
 
         return new Response(null, {
@@ -36,19 +37,15 @@ export class ScreenState {
 
     async handleSession(webSocket: WebSocket) {
         webSocket.accept();
-
         let session: any = { webSocket, id: this.sessions.length };
         this.sessions.push(session);
 
-        console.log('test1')
         webSocket.addEventListener('message', async msg => {
             try {
                 if (session.quit) {
                     webSocket.close(1011, "WebSocket broken.");
                     return;
                 }
-
-                console.log(msg.data)
 
                 let data = JSON.parse(msg.data as string);
 
@@ -63,8 +60,7 @@ export class ScreenState {
                 } else await this.store.put(session.id, { x: xDat, y: yDat });
 
                 const dataList = await Promise.all(this.sessions.map(session => this.store.get(session.id)))
-
-                let dataStr = JSON.stringify(dataList);
+                let dataStr = JSON.stringify(dataList.filter(pos => pos !== undefined));
                 this.broadcast(dataStr);
             } catch (err: any) {
                 webSocket.send(JSON.stringify({ error: 'Something went wrong: ' + err.message }));
@@ -101,7 +97,6 @@ export default {
     async fetch(request: Request, env: Env): Promise<Response> {
         const id = env.SCREEN_STATE.idFromName('global')
         const stub = env.SCREEN_STATE.get(id);
-        console.log('2')
         return await stub.fetch(request)
     }
 };
