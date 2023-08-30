@@ -90,11 +90,11 @@ export class ScreenState {
                 } else if(this.screenSocket !== null) {
                     if (Date.now() - this.lastPong > 10 * 1000) {
                         if (this.pingCount > 3) {
-                            this.screenSocket = null
-                            this.broadcast({ screenOnline: false })
+                            // this.screenSocket = null
+                            // this.broadcast({ screenOnline: false })
                         }
                         if (Date.now() - this.lastPing > 1000) {
-                            if (this.screenSocket !== null) this.screenSocket.send('ping')
+                            // if (this.screenSocket !== null) this.screenSocket.send('ping')
                             this.lastPing = Date.now()
                             this.pingCount++
                         }
